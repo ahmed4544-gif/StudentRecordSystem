@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 class Student
@@ -38,12 +39,22 @@ public:
     }
 };
 
+bool compareByCGPA(Student a, Student b)
+{
+    return a.getCGPA() > b.getCGPA();   
+}
+
+bool compareByName(Student a, Student b)
+{
+    return a.getName() < b.getName();  
+}
+
 class StudentManager
 {
 private:
     vector<Student> students;
 
-    // Returns the position of a student in the vector, or -1 if not found
+  
     int findIndex(int roll)
     {
         for (int i = 0; i < students.size(); i++)
@@ -189,7 +200,7 @@ public:
         cout << "Enter new CGPA: ";
         cin >> cgpa;
 
-        // The roll number stays the same
+        /
         students[index].setData(roll, name, department, semester, cgpa);
 
         cout << "Student updated successfully!\n";
@@ -224,6 +235,74 @@ public:
             cout << "Delete cancelled.\n";
         }
     }
+
+   
+    void sortAndDisplay()
+    {
+        if (students.empty())
+        {
+            cout << "No student records found.\n";
+            return;
+        }
+
+        int option;
+        cout << "Sort by: 1. CGPA (highest first)  2. Name (A to Z)\n";
+        cout << "Enter option: ";
+        cin >> option;
+
+        vector<Student> sorted = students;  
+        if (option == 1)
+        {
+            sort(sorted.begin(), sorted.end(), compareByCGPA);
+        }
+        else if (option == 2)
+        {
+            sort(sorted.begin(), sorted.end(), compareByName);
+        }
+        else
+        {
+            cout << "Invalid option.\n";
+            return;
+        }
+
+        for (int i = 0; i < sorted.size(); i++)
+            sorted[i].displayData();
+    }
+
+    void showStatistics()
+    {
+        if (students.empty())
+        {
+            cout << "No student records found.\n";
+            return;
+        }
+
+        float total = 0;
+        for (int i = 0; i < students.size(); i++)
+            total += students[i].getCGPA();
+
+        float average = total / students.size();
+
+        cout << "\n===== Statistics =====\n";
+        cout << "Total students: " << students.size() << endl;
+        cout << "Average CGPA: " << average << endl;
+
+       
+        vector<Student> sorted = students;
+        sort(sorted.begin(), sorted.end(), compareByCGPA);
+
+        int count = 3;
+        if (sorted.size() < 3)
+            count = sorted.size();
+
+        cout << "\nTop " << count << " students:\n";
+        for (int i = 0; i < count; i++)
+        {
+            cout << i + 1 << ". " << sorted[i].getName()
+                 << " (Roll " << sorted[i].getRollNumber() << ")"
+                 << " - CGPA: " << sorted[i].getCGPA() << endl;
+        }
+    }
 };
 
 int main()
@@ -239,7 +318,9 @@ int main()
         cout << "3. Search Student\n";
         cout << "4. Update Student\n";
         cout << "5. Delete Student\n";
-        cout << "6. Exit\n";
+        cout << "6. Sort and Display Students\n";
+        cout << "7. Show Statistics\n";
+        cout << "8. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -254,11 +335,15 @@ int main()
         else if (choice == 5)
             manager.deleteStudent();
         else if (choice == 6)
+            manager.sortAndDisplay();
+        else if (choice == 7)
+            manager.showStatistics();
+        else if (choice == 8)
             cout << "Exiting program...\n";
         else
             cout << "Invalid choice. Try again.\n";
 
-    } while (choice != 6);
+    } while (choice != 8);
 
     return 0;
 }
